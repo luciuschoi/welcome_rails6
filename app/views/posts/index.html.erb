@@ -2,7 +2,7 @@
 
 <h1>Posts</h1>
 
-<table>
+<table class="table table-bordered">
   <thead>
     <tr>
       <th>Title</th>
@@ -13,12 +13,14 @@
 
   <tbody>
     <% @posts.each do |post| %>
-      <tr>
+      <tr id='post-<%= post.id %>'>
         <td><%= post.title %></td>
         <td><%= post.content %></td>
         <td><%= link_to 'Show', post %></td>
         <td><%= link_to 'Edit', edit_post_path(post) %></td>
-        <td><%= link_to 'Destroy', post, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td data-controller='confirm'>
+          <%= link_to 'Destroy', post, data: { action: "click->confirm#dialog" } %>
+        </td>
       </tr>
     <% end %>
   </tbody>
@@ -26,4 +28,4 @@
 
 <br>
 
-<%= link_to 'New Post', new_post_path %>
+<%= link_to 'New Post', new_post_path, class: 'btn btn-primary' %>
