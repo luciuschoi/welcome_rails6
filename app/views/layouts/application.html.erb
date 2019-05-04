@@ -10,6 +10,8 @@
   </head>
 
   <body>
+    <!-- 여기에 flash messages 삽입 -->
+    <div data-controller='flash' data-flash-messages='<%= flash[:notice] || notice %>'></div>    
     <!-- 여기에 navbar 삽입 -->
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
       <a class="navbar-brand" href="#">Navbar</a>

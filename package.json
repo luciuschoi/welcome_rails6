@@ -12,6 +12,7 @@
     "popper.js": "^1.15.0",
     "stimulus": "^1.1.1",
     "sweetalert2": "^8.10.0",
+    "toastr": "^2.1.4",
     "turbolinks": "^5.2.0"
   },
   "version": "0.1.0",
