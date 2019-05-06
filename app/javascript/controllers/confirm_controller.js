@@ -1,5 +1,6 @@
 import { Controller } from 'stimulus'
 import Swal from 'sweetalert2'
+import toastr from 'toastr'
 
 export default class extends Controller {
   dialog(event) {
@@ -9,29 +10,20 @@ export default class extends Controller {
 
     Swal.fire({
       title: 'Are you sure?',
-      text: "You won't be able to revert this!",
       type: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
+      showCancelButton: true
     }).then((result) => {
       if (result.value) {
-        let promise = $.ajax({
+        $.ajax({
           type: 'DELETE',
-          url: originLink + '.json'
-        })  
-
-        promise.fail(cancelFunc)
-        promise.done(confirmFunc)
-
-        function confirmFunc(){
+          url: `${originLink}.json`
+        }).then(() => {
           $(`#${target_id_attr}`).slideUp(1000)
-          Swal.fire("Successfully deleted.")
-        }
-        function cancelFunc(){
-          Swal.fire("Error occurred.")
-        }
+          toastr.success("Successfully deleted.")
+        }).catch((err) => {
+          console.log(err.statusText)
+          toastr.error("Error occurred.")
+        })
       }
     })
   }
