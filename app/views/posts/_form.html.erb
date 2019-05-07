@@ -1,4 +1,4 @@
-<%= form_with(model: post, local: true) do |form| %>
+<%= form_with(model: post, local: true, data: {controller: 'tui-editor', action: 'submit->tui-editor#submit'}) do |form| %>
   <% if post.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(post.errors.count, "error") %> prohibited this post from being saved:</h2>
@@ -18,7 +18,7 @@
 
   <div class="field">
     <%= form.label :content %>
-    <%= form.text_area :content, rows: 5, class: 'form-control' %>
+    <%= form.text_area :content, data: { editor: 'tui-editor', target: 'tui-editor.content' } %>
   </div>
 
   <div class="actions">

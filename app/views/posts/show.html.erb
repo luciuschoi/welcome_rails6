@@ -1,12 +1,14 @@
 <p>
   <strong>Title:</strong>
-  <%= @post.title %>
+  <h1><%= @post.title %></h1>
+  <hr>
 </p>
 
-<p>
-  <strong>Content:</strong>
-  <%= @post.content %>
-</p>
+<div data-controller='tui-viewer'>
+  <div data-viewer='tui-viewer'>
+    <%= @post.content %>
+  </div>
+</div>
 
 <%= link_to 'Edit', edit_post_path(@post) %> |
 <%= link_to 'Back', posts_path %>

@@ -407,3 +407,133 @@
     <div data-controller='flash' 
          data-flash-messages='<%= flash[:notice] || notice %>'></div>
     ```
+    
+    
+
+
+## 5. Tui-Editor 
+
+- 패키지 설치
+
+  ```sh
+  $ yarn add tui-editor
+  ```
+
+- 에디터전용 컨트롤러의 작성
+  **app/javascript/controllers/tui_editor_controller.js**
+
+  ```js
+  import { Controller } from 'stimulus'
+  
+  // import 'tui-editor';
+  import "tui-editor/dist/tui-editor-Editor-all"
+  import 'tui-chart';
+  import 'raphael';
+  import 'plantuml-encoder';
+  import 'tui-color-picker';
+  import 'tui-code-snippet';
+  
+  // deps for editor
+  require('codemirror/lib/codemirror.css'); // codemirror
+  require('tui-editor/dist/tui-editor.css'); // editor ui
+  require('tui-editor/dist/tui-editor-contents.css'); // editor content
+  require('highlight.js/styles/github.css'); // code block highlight
+  require('tui-color-picker/dist/tui-color-picker.css');
+  require('tui-chart/dist/tui-chart.css');
+  
+  export default class extends Controller {
+    static targets = [ 'content' ]
+  
+  	connect(){
+      console.log("tuiEditor connected!")
+      $("[data-editor='tui-editor']").hide().after("<div id='editSection'></div>")
+      $("#editSection").tuiEditor({
+        initialEditType: 'markdown',
+        initialValue: this.contentTarget.value,
+        previewStyle: 'vertical',
+        height: '500px',
+        exts: ['scrollSync', 'colorSyntax', 'uml', 'chart', 'mark', 'table']
+      })
+    }
+  
+    submit(event){
+      console.log('submitted....')
+      this.contentTarget.textContent =$("#editSection").tuiEditor('getValue')
+    }
+  }
+  ```
+
+- 폼 템플릿의 설정
+  **app/views/posts/_form.html.erb**
+
+  ```erb
+  <%= form_with(model: post, local: true, data: {controller: 'tui-editor', action: 'submit->tui-editor#submit'}) do |form| %>
+    <% if post.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= pluralize(post.errors.count, "error") %> prohibited this post from being saved:</h2>
+  
+        <ul>
+          <% post.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+  
+    <div class="field">
+      <%= form.label :title %>
+      <%= form.text_field :title, class: 'form-control' %>
+    </div>
+  
+    <div class="field">
+      <%= form.label :content %>
+      <%= form.text_area :content, data: { editor: 'tui-editor', target: 'tui-editor.content' } %>
+    </div>
+  
+    <div class="actions">
+      <%= form.submit class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+  ```
+
+- 뷰어전용 컨트롤러의 작성
+  **app/javascript/controllers/tui_viewer_controller.js**
+
+  ```js
+  import { Controller } from 'stimulus'
+  
+  export default class extends Controller {
+    static targets = []
+  
+    connect(){
+      console.log("tuiViewer connected!")
+      $("[data-viewer='tui-viewer']").hide().after("<div id='viewSection'></div>")
+      $("#viewSection").tuiEditor({
+        initialValue: $("[data-viewer='tui-viewer']").text(),
+        height: '500px',
+        viewer: true
+      })
+    }
+  }
+  ```
+
+- 뷰 템플릿의 설정
+  **app/views/posts/show.html.erb**
+
+  ```erb
+  <p>
+    <strong>Title:</strong>
+    <h1><%= @post.title %></h1>
+    <hr>
+  </p>
+  
+  <div data-controller='tui-viewer'>
+    <div data-viewer='tui-viewer'>
+      <%= @post.content %>
+    </div>
+  </div>
+  
+  <%= link_to 'Edit', edit_post_path(@post) %> |
+  <%= link_to 'Back', posts_path %>
+  ```
+  
