@@ -407,3 +407,75 @@
     <div data-controller='flash' 
          data-flash-messages='<%= flash[:notice] || notice %>'></div>
     ```
+
+
+## 5. Action Text
+
+- **레일스 6**에서 처음으로 도입된 **action_text** 는 리치텍스트 문서를 편집할 수 있는 기능을 제공한다. 일단 설치하면 **Trix** 에디터와 **active_storage**를 바로 사용할 수 있게 된다. 
+
+- **action_text** 설치 및 데이터베이스 마이그레이션 작업
+
+  ```sh
+  $ bin/rails action_text:install
+  Copying actiontext.scss to app/assets/stylesheets
+        create  app/assets/stylesheets/actiontext.scss
+  Copying fixtures to test/fixtures/action_text/rich_texts.yml
+        create  test/fixtures/action_text/rich_texts.yml
+  Copying blob rendering partial to app/views/active_storage/blobs/_blob.html.erb
+        create  app/views/active_storage/blobs/_blob.html.erb
+  Installing JavaScript dependencies
+           run  yarn add trix@^1.0.0 @rails/actiontext@^6.0.0-rc1 from "."
+  yarn add v1.15.2
+  [1/4] 🔍  Resolving packages...
+  [2/4] 🚚  Fetching packages...
+  [3/4] 🔗  Linking dependencies...
+  warning " > webpack-dev-server@3.3.1" has unmet peer dependency "webpack@^4.0.0".
+  warning "webpack-dev-server > webpack-dev-middleware@3.6.2" has unmet peer dependency "webpack@^4.0.0".
+  [4/4] 🔨  Building fresh packages...
+  
+  success Saved lockfile.
+  success Saved 2 new dependencies.
+  info Direct dependencies
+  ├─ @rails/actiontext@6.0.0-rc1
+  └─ trix@1.1.1
+  info All dependencies
+  ├─ @rails/actiontext@6.0.0-rc1
+  └─ trix@1.1.1
+  ✨  Done in 3.94s.
+  Adding trix to app/javascript/packs/application.js
+        append  app/javascript/packs/application.js
+  Adding @rails/actiontext to app/javascript/packs/application.js
+        append  app/javascript/packs/application.js
+  Copied migration 20190508043800_create_active_storage_tables.active_storage.rb from active_storage
+  Copied migration 20190508043801_create_action_text_tables.action_text.rb from action_text
+  $ bin/rails db:migrate
+  ```
+
+- **action_text**에서 업로드된 이미지를 처리할 수 있도록 **image_processing** 젬을 추가 번들한다.
+
+  ```ruby
+  gem 'image_processing', '~> 1.2'
+  ```
+
+  그리고 **bundle install** 한다 
+
+  ```sh
+  $ bundle install
+  ```
+
+- 대상 모델에서 대상 필드를 지정
+
+  ```ruby
+  class Post < ApplicationRecord
+    has_rich_text :content
+  end
+  ```
+
+- 폼 템플릿 파일에서 전용 폼 메소드 추가
+
+  ```erb
+  <div class="field">
+    <%= form.label :content %>
+    <%= form.rich_text_area :content %>
+  </div>
+  ```

@@ -4,6 +4,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free-webfonts": "^1.0.9",
     "@rails/actioncable": "^6.0.0-alpha",
+    "@rails/actiontext": "^6.0.0-rc1",
     "@rails/activestorage": "^6.0.0-alpha",
     "@rails/ujs": "^6.0.0-alpha",
     "@rails/webpacker": "^4.0.2",
@@ -13,6 +14,7 @@
     "stimulus": "^1.1.1",
     "sweetalert2": "^8.10.0",
     "toastr": "^2.1.4",
+    "trix": "^1.0.0",
     "turbolinks": "^5.2.0"
   },
   "version": "0.1.0",
