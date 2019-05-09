@@ -8,9 +8,11 @@
     "@rails/ujs": "^6.0.0-alpha",
     "@rails/webpacker": "^4.0.2",
     "bootstrap": "^4.3.1",
+    "codemirror": "^5.46.0",
     "jquery": "^3.4.1",
     "popper.js": "^1.15.0",
     "stimulus": "^1.1.1",
+    "summernote": "^0.8.11",
     "sweetalert2": "^8.10.0",
     "toastr": "^2.1.4",
     "turbolinks": "^5.2.0"

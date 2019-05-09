@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  uploadable: one
+  uploadable_type: Uploadable
+
+two:
+  uploadable: two
+  uploadable_type: Uploadable
