@@ -407,3 +407,254 @@
     <div data-controller='flash' 
          data-flash-messages='<%= flash[:notice] || notice %>'></div>
     ```
+
+
+## 5. Summernote
+
+- 패키지 설치
+
+  > **주의**: **summernote** 패키지를 추가할 때 **codemirror** 패키지도 함께 추가해 준다.
+
+  ```sh
+  $ yarn add summernote codemirror
+  ```
+
+- 이미지를 업로드하여 처리할 때 필요한 젬을 설치
+  Gemfile을 열고 아래와 같이 젬을 추가한다. 
+
+  ```ruby
+  gem 'image_processing', '~> 1.2'
+  ```
+  
+  번들 인스톨 명령을 실행한다.
+  
+  ```sh
+  $ bundle install
+  ```
+  
+- 전용컨트롤러의 생성
+  **app/javascript/controllers/summernote_controller.js**
+
+  ```js
+  import { Controller } from 'stimulus'
+  
+  // summernote용 자바스크립트 (Bootstrap 4 버전용)
+  require('summernote/dist/summernote-bs4.js');
+  // summernote용 스타일시트 (Boostrap 4 버전용)
+  require('summernote/dist/summernote-bs4.css');
+  // summernote용 한국어 로케일
+  require('summernote/dist/lang/summernote-ko-KR.min.js');
+  // codemirror용 자바스크립트
+  require('codemirror/lib/codemirror.js');
+  // codemirror용 스타일시트
+  require('codemirror/lib/codemirror.css');
+  // codemirror용 language 모드를 xml로 지정
+  require('codemirror/mode/xml/xml.js');
+  // codemirror에서 사용하는 테마 스타일시트(monokai)
+  require('codemirror/theme/monokai.css');
+  
+  export default class extends Controller {
+    static targets = []
+  
+    initialize(){
+      // summernote 에디터에서 이모지를 입력할 수 있도록 한번만 ajax 호출
+      $.ajax({
+        url: 'https://api.github.com/emojis'
+      }).then(function(data) {
+        window.emojis = Object.keys(data);
+        window.emojiUrls = data; 
+      })     
+    }
+  
+    connect(){
+      console.log("summernote connected.")
+      $('[data-editor="summernote"]').summernote({
+        height: 300,
+        focus: true,
+        lang: 'ko-KR',
+        prettifyHtml: true,
+        placeholder: 'type starting with : and any alphabet',
+        hint: {
+          match: /:([\-+\w]+)$/,
+          search: function (keyword, callback) {
+            callback($.grep(emojis, function (item) {
+              return item.indexOf(keyword)  === 0;
+            }));
+          },
+          template: function (item) {
+            var content = emojiUrls[item];
+            return '<img src="' + content + '" width="20" /> :' + item + ':';
+          },
+          content: function (item) {
+            var url = emojiUrls[item];
+            if (url) {
+              return $('<img />').attr('src', url).css('width', 20)[0];
+            }
+            return '';
+        }
+        },      
+        codemirror: { 
+          theme: 'monokai',
+          mode: "text/html",
+          lineNumbers: true,
+          lineWrapping: true,
+          tabSize: 2,
+          tabMode: 'indent'
+        },
+        callbacks: {
+          onImageUpload: function(files){
+            console.log('called onImageUpload.')
+            sendFile(files[0], $(this))
+          },
+          onMediaDelete: function(target, editor, editiable){
+            console.log("called onMediaDelete.")
+            let upload_id = target[0].id
+            if(!!upload_id){
+              deleteFile(upload_id)
+            }
+            target.remove()
+          }
+        }
+      })
+  
+      function sendFile(file, toSummernote){
+        console.log('called sendFile().')
+        let data = new FormData()
+        data.append('upload[image]', file)
+        $.ajax({
+          data: data,
+          type: 'POST',
+          url: '/uploads.json',
+          cache: false,
+          contentType: false,
+          processData: false,
+          success: function(data){
+            console.log("image url: ", data.url)
+            console.log('successfully created.')
+            let img = document.createElement("IMG")
+            img.src = data.url
+            img.setAttribute('id', data.upload_id)
+            toSummernote.summernote("insertNode", img)
+          }
+        })
+      }
+  
+      function deleteFile(file_id){
+        $.ajax({
+          type: 'DELETE',
+          url: `/uploads/${file_id}`,
+          cache: false,
+          contentType: false,
+          processData: false
+        })
+      }
+    }
+  }
+  ```
+  
+- 폼 뷰 파일의 옵션 추가
+
+  ```erb
+  ···
+  <div data-controller="summernote" class="field">
+    <%= form.label :content %>
+    <%= form.text_area :content, data: { editor: 'summernote' } %>
+  </div>
+  ···
+  ```
+
+- **show** 뷰 파일의 옵션 추가
+
+  ```erb
+  ···
+  <p>
+    <strong>Content:</strong>
+    <%= @post.content.html_safe %>
+  </p>
+  ···
+  ```
+
+- **codemirror** 에 대한 사용설명
+  https://summernote.org/examples/#codemirror-as-codeview
+
+- 이미지 파일 업로드를 위한 모델 생성
+
+  ```sh
+  $ bin/rails g model Upload
+  ```
+
+- **Upload** 모델 클래스 파일에서 처부할 항목명 지정
+
+  ```ruby
+  class Upload < ApplicationRecord
+    has_one_attached :image
+  end
+  ```
+
+- 이미지 업로드에 필요한 **active_storage**를 사용하기 위해 관련 마이그레이션 작업을 생성함
+
+  ```sh
+  $ bin/rails active_storage:install
+  ```
+
+  이어서 생성된 마이그레이션 파일에 대해서 db:migraqte 레일스 명령을 실행함.
+
+  ```sh
+  $ bin/rails db:migrate
+  ```
+
+- 업로드할 이미지를 처리할 컨트롤러 생성
+
+  ```sh
+  $ bin/rails g controller uploads create destroy
+  ```
+
+  **app/controllers/uploads_controller.rb** 파일을 열고 아래와 같이 추가해 준다. 
+
+  ```ruby
+  class UploadsController < ApplicationController
+    def create
+      @upload = Upload.new(upload_params)
+      @upload.save
+  
+      respond_to do |format|
+        format.json { render json: { url: rails_blob_url(@upload.image), upload_id: @upload.id } }
+      end
+    end
+  
+    def destroy
+      @upload = Upload.find(params[:id])
+      @upload.destroy
+  
+      respond_to do |format|
+        format.json { render json: { status: :ok } }
+      end
+    end
+  
+    private
+  
+    def upload_params
+      params.require(:upload).permit(:image)
+    end
+  end
+  ```
+
+  (참고동영상) [Episode #027 - WYSIWYG Editor with Summernote](https://youtu.be/A3vDRdfEyKs)
+
+- 라우트 파일을 열고 아래와 같이 업데이트 한다.
+
+  ```ruby
+  Rails.application.routes.draw do
+    root to: 'home#index'
+    resources :posts
+    resources :uploads, only: [:create, :destroy]
+  end
+  ```
+
+  생성되는 라우트를 확인하기 위해 아래와 같은 명령을 실행해 본다.
+
+  ```sh
+  $ bin/rails routes -c=uploads
+  ```
+
+  > 노트 : `-c` 옵션은 특정 컨트롤러의 라우트만 보기 위한 것이다.
