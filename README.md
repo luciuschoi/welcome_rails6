@@ -658,3 +658,17 @@
   ```
 
   > 노트 : `-c` 옵션은 특정 컨트롤러의 라우트만 보기 위한 것이다.
+
+## 6. Changelogs
+
+- summernote 0.8.12 : 2019년 5월 16일자로 업그레이드됨. 이미지 드래그앤드롭 기능 정사동작함.
+  ```sh
+  $ yarn upgrade summernote@^0.8.12
+  $ npm install
+  ```
+  > 노트 : 또는 최신버전으로 업그레이드할 경우
+
+  ```sh
+  $ yarn upgrade summernote --latest
+  ```
+- summernote 0.8.11 : 이미지 파일의 드래그앤드롭 기능에 오류가 있어 동작하지 않음
