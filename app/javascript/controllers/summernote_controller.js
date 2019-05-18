@@ -59,7 +59,10 @@ export default class extends Controller {
       callbacks: {
         onImageUpload: function(files){
           console.log('called onImageUpload.')
-          sendFile(files[0], $(this))
+          for(let i = 0; i < files.length; i++){
+            console.log(files[i])
+            sendFile(files[i], $(this))
+          }
         },
         onMediaDelete: function(target, editor, editiable){
           console.log("called onMediaDelete.")

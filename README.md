@@ -504,7 +504,11 @@
         callbacks: {
           onImageUpload: function(files){
             console.log('called onImageUpload.')
-            sendFile(files[0], $(this))
+            <!-- multiple files uploading... -->
+            for(let i = 0; i < files.length; i++){
+              console.log(files[i])
+              sendFile(files[i], $(this))
+            }
           },
           onMediaDelete: function(target, editor, editiable){
             console.log("called onMediaDelete.")
@@ -597,7 +601,7 @@
   $ bin/rails active_storage:install
   ```
 
-  이어서 생성된 마이그레이션 파일에 대해서 db:migraqte 레일스 명령을 실행함.
+  이어서 생성된 마이그레이션 파일에 대해서 db:migrate 레일스 명령을 실행함.
 
   ```sh
   $ bin/rails db:migrate
@@ -661,6 +665,15 @@
 
 ## 6. Changelogs
 
+- 2019.5.18 : 다중 이미지 파일 동시 업로드 가능하게 수정함.
+  ```javascript
+  ···
+  for(let i = 0; i < files.length; i++){
+    console.log(files[i])
+    sendFile(files[i], $(this))
+  }
+  ···
+  ```        
 - summernote 0.8.12 : 2019년 5월 16일자로 업그레이드됨. 이미지 드래그앤드롭 기능 정사동작함.
   ```sh
   $ yarn upgrade summernote@^0.8.12
