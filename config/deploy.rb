@@ -12,11 +12,13 @@ set :rbenv_map_bins, %w[rake gem bundle ruby rails]
 append :rbenv_map_bins, 'puma', 'pumactl'
 set :rbenv_roles, :all # default value
 
-set :nginx_domains, "_"
+# set :nginx_domains, "_"
 
 # Master Key Upload
 set :user, 'deployer'
 set :master_key_local_path, "/Users/lucius/myrails/r6/welcome_rails6/config/master.key"
+
+set :puma_bind, "unix://#{shared_path}/tmp/sockets/#{fetch(:application)}-puma.sock"
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
