@@ -42,6 +42,7 @@ group :development do
   gem 'capistrano-nc', '~> 0.2'
   gem 'capistrano-master-key', github: 'virgoproz/capistrano-master-key'
   gem 'capistrano-yarn'
+  gem 'capistrano-rails-db'
 
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
