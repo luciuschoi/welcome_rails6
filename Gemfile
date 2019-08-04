@@ -43,7 +43,9 @@ group :development do
   gem 'capistrano-master-key', github: 'virgoproz/capistrano-master-key'
   gem 'capistrano-yarn'
   gem 'capistrano-rails-db'
-
+  gem "capistrano-db-tasks", require: false
+  gem 'capistrano-rails-console', require: false
+  gem 'capistrano-rails-tail-log'
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 3.3.0'
